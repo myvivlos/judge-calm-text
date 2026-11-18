@@ -1,6 +1,9 @@
 """Write the fixed ai-judge-relax-01 entry text to entry.txt using stdlib only."""
 
+import hashlib
 import os
+
+ENTRY_BYTES = 546
 
 
 def build_text() -> str:
@@ -23,13 +26,19 @@ def main() -> None:
     encoded = text.encode("utf-8")
     if not encoded or not text.strip() or len(text) > 1000 or len(encoded) > 1000:
         raise ValueError("Encoded entry text must be non-empty and at most 1000 characters.")
+    assert len(encoded) == ENTRY_BYTES
 
     output_dir = os.environ.get("MAKEFUN_OUTPUT_DIR", "/output")
     if output_dir:
         os.makedirs(output_dir, exist_ok=True)
     output_path = os.path.join(output_dir, "entry.txt")
+    # Write as raw UTF-8 bytes rather than text mode to avoid platform-dependent line-ending translation or locale encoding differences.
     with open(output_path, "wb") as f:
         f.write(encoded)
+
+    if os.environ.get("MAKEFUN_VERBOSE") == "1":
+        digest = hashlib.sha256(encoded).hexdigest()
+        print(f"{output_path} {len(encoded)} {digest}")
 
 
 if __name__ == "__main__":
