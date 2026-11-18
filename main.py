@@ -26,7 +26,8 @@ def main() -> None:
     encoded = text.encode("utf-8")
     if not encoded or not text.strip() or len(text) > 1000 or len(encoded) > 1000:
         raise ValueError("Encoded entry text must be non-empty and at most 1000 characters.")
-    assert len(encoded) == ENTRY_BYTES
+    if len(encoded) != ENTRY_BYTES:
+        raise ValueError(f"Expected {ENTRY_BYTES} bytes, got {len(encoded)} bytes.")
 
     output_dir = os.environ.get("MAKEFUN_OUTPUT_DIR", "/output")
     if output_dir:
